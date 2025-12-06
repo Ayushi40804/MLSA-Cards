@@ -1,12 +1,12 @@
-# MLSACard: Puzzle Based Virtual Card Game
+# 💡 MLSACard: Puzzle Based Virtual Card Game
 
-**MLSACard** is an innovative, gamified web application from the **MLSA KIIT Chapter** that bridges **technical puzzles and engineering questions** with **blockchain technology**. Users earn in-game points by successfully solving gamified challenges. These points can be redeemed for unique virtual collectible cards themed around the chapter, which are secured and owned as **Non-Fungible Tokens (NFTs)** on the blockchain.
+**MLSACard** is an innovative, gamified web application from the **MLSA KIIT Chapter** that bridges **technical puzzles and engineering questions** with **blockchain technology**. This application functions as a **Hybrid Decentralized Application (DApp)**. Users earn in-game points by successfully solving gamified challenges. These points can be redeemed for unique virtual collectible cards themed around the chapter, which are secured and owned as **Non-Fungible Tokens (NFTs)** on the blockchain.
 
-## Features
+## ✨ Features
 
 * **Wallet-Based Authentication:** Secure login using **MetaMask** and wallet signatures.
 * **Point Earning:**
-    * **Puzzle/Quiz Rewards:** Earn points by successfully solving chapter-based technical puzzles or answering trivia questions.
+    * **🧠 Puzzle/Quiz Rewards:** Earn points by successfully solving chapter-based technical puzzles or answering trivia questions.
 * **Virtual Card Shop:** Spend earned points to purchase collectible cards with varying rarity and unique MLSACard metadata.
 * **Gasless NFT Minting:** Collectible cards are minted as **ERC-721 NFTs** using **gasless / lazy minting**, giving each player a unique digital card on the blockchain without requiring them to pay upfront gas fees.
 * **True Digital Ownership:** Cards are secured on the **Polygon Blockchain**.
@@ -14,29 +14,36 @@
 
 ---
 
-## System Architecture (Python Focus)
+## ⚙️ System Architecture (Python Focus)
 
 The system uses a **Three-Tier Architecture**, implemented entirely using Python frameworks and libraries:
 
 | Component | Technology (Python) | Role |
 | :--- | :--- | :--- |
-| **Web Client** (Frontend) | **Streamlit** (or Django/React for full web app) | The user interface for the dashboard, **puzzle interface**, and card shop. |
+| **Web Client** (Frontend) | **Streamlit** (or Django/React) | The user interface for the dashboard, **puzzle interface**, and card shop. |
 | **Backend Server** (Logic/API) | **FastAPI** | Handles authentication, point management, **puzzle validation logic**, and secure NFT minting requests. |
-| **Database** | **Pymongo** (for MongoDB) | Stores user data, points, levels, **puzzle/question bank**, and card catalog metadata. |
+| **Database** | **Pymongo** (for MongoDB) | Stores user data, points, levels, the **puzzle/question bank**, and card catalog metadata. |
 | **Blockchain** (Smart Contracts) | **web3.py** (Interaction Library) | Manages card ownership and token transfers using Solidity smart contracts deployed on Polygon. |
+
+### ⚖️ DApp Structure & Decentralization
+
+MLSACard operates as a **Hybrid DApp**:
+
+* **Decentralized Core:** The critical asset management (NFT ownership and secure trading) is fully decentralized, running on the **Polygon Blockchain** via **ERC-721 Smart Contracts**.
+* **Centralized Middleware:** The **FastAPI Backend** and **MongoDB** handle all off-chain logic, including **puzzle validation**, **point accumulation**, and generating the secure cryptographic signatures required for **gasless (lazy) minting**. This approach ensures performance and maintains the integrity of the game's reward system.
 
 
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 These instructions detail the setup for the Python-based MLSACard system.
 
 ### Prerequisites
 
 * **Python 3.9+**
-* **Node.js** (for running client/contract tools if not fully Python)
+* **Node.js** (for supporting contract tools if not fully Python)
 * **MongoDB** server running locally or accessible via a connection string.
 * **MetaMask** extension installed and connected to the **Polygon Testnet** (or Mainnet).
 
@@ -44,7 +51,7 @@ These instructions detail the setup for the Python-based MLSACard system.
 
 ### 1. Backend Server Setup (FastAPI)
 
-1.  Clone the repository:
+1.  Clone the repository and navigate to the backend directory:
     ```bash
     git clone [Your-Repo-URL]
     cd MLSACard/backend
@@ -59,11 +66,11 @@ These instructions detail the setup for the Python-based MLSACard system.
     pip install -r requirements.txt
     # Key Libraries: fastapi, uvicorn, pymongo, web3, pycryptodome (for signature validation)
     ```
-4.  Create a `.env` file and add configuration:
+4.  Create a **`.env`** file and configure settings:
     ```
-    MONGODB_URI=mongodb://localhost:27017/mlsacard_db # Renamed DB for clarity
+    MONGODB_URI=mongodb://localhost:27017/mlsacard_db
     POLYGON_RPC_URL=[https://polygon-mumbai.g.alchemy.com/v2/YOUR_KEY](https://polygon-mumbai.g.alchemy.com/v2/YOUR_KEY)
-    MINTER_PRIVATE_KEY=0x... # Securely stored private key for gasless/lazy minting signature
+    MINTER_PRIVATE_KEY=0x... # Minter private key for gasless/lazy minting signature
     NFT_CONTRACT_ADDRESS=0x... # Deployed ERC-721 contract address
     ```
 5.  Run the server:
