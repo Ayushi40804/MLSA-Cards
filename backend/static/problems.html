@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Problems | MLSA Cards</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      /* Additional page-specific styles */
+      .problem-card {
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: #111827;
+        color: #cbd5e1;
+        font-weight: 600;
+        border: 1px solid #1f2937;
+        transition: all 0.2s ease;
+      }
+      nav a:hover { background: #1f2937; color: #fff; }
+      .nav-points {
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: #0f3c2f;
+        color: #34d399;
+        border: 1px solid #14532d;
+        font-weight: 800;
+      }
+      main { max-width: 960px; margin: 0 auto; display: grid; gap: 16px; }
+      section {
+        background: #0f172a;
+        border: 1px solid #1f2937;
+        border-radius: 14px;
+        padding: 18px 18px 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+      }
+      h2 { font-size: 1.2rem; margin-bottom: 12px; color: #e0f2fe; }
+      button {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+      }
+      .btn-primary { background: linear-gradient(135deg, #22d3ee, #06b6d4); color: #0b1323; }
+      .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(34,211,238,0.35); }
+      .btn-secondary { background: #1f2937; color: #e2e8f0; border: 1px solid #2b3547; }
+      .btn-secondary:hover { background: #273345; }
+      button:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; transform: none; }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-top: 10px;
+      }
+      .status-connected { background: #1e293b; color: #34d399; border: 1px solid #134e4a; }
+      .status-error { background: #2f172a; color: #f87171; border: 1px solid #7f1d1d; }
+      .status-success { background: #12212f; color: #38bdf8; border: 1px solid #0ea5e9; }
+      .connection-grid { display: grid; gap: 8px; margin-top: 10px; }
+      .info-row {
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-between;
+        color: #cbd5e1;
+      }
+      .info-row span:last-child { color: #38bdf8; }
+      .points-display {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: #38bdf8;
+        text-align: center;
+        margin: 6px 0 14px;
+      }
+      .pill { display: inline-block; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; }
+      .pill-green { background: #0f3c2f; color: #34d399; border: 1px solid #0f5132; }
+      .problem-card {
+        background: #0b1220;
+        border: 1px solid #1f2937;
+        border-radius: 14px;
+        padding: 16px;
+        display: grid;
+        gap: 12px;
+      }
+      .problem-head { display: flex; justify-content: space-between; align-items: center; }
+      .problem-question { font-size: 1.1rem; font-weight: 700; color: #e2e8f0; }
+      .problem-stats { color: #94a3b8; font-size: 0.9rem; }
+      input[type="text"] {
+        width: 100%;
+        background: #0f172a;
+        border: 1px solid #1f2937;
+        border-radius: 10px;
+        padding: 12px;
+        color: #e2e8f0;
+        font-size: 1rem;
+      }
+      input[type="text"]:focus { outline: 2px solid #22d3ee; }
+      .actions { display: flex; gap: 10px; }
+      .actions button { flex: 1; }
+      #answerResult { margin-top: 8px; }
+      .result-correct {
+        background: #0f3c2f;
+        color: #34d399;
+        border: 1px solid #14532d;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 700;
+      }
+      .result-incorrect {
+        background: #3b2a0f;
+        color: #facc15;
+        border: 1px solid #f59e0b;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 700;
+      }
+      .link-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+      .link-chip { background: #111827; border: 1px solid #1f2937; color: #e2e8f0; padding: 8px 12px; border-radius: 999px; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-badge">ML</div>
+        <span class="brand-text">MLSA Cards</span>
+      </div>
+      <div class="nav-right">
+        <a href="/home.html" class="nav-link">Home</a>
+        <a href="/store.html" class="nav-link">Store</a>
+        <a href="/problems.html" class="nav-link active">Problems</a>
+        <a href="/cards.html" class="nav-link">My Cards</a>
+        <span class="nav-points" id="navPoints">Points: 0</span>
+        <div class="user-badge" id="userBadge">
+          <span id="userAddress">0x...</span>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <section class="section">
+        <h2>Solve Problems to Earn Points</h2>
+        <div id="problemContainer" style="display:none;" class="problem-card">
+          <div class="problem-head">
+            <span class="pill" id="problemCategory" style="background:#111827; border:1px solid #1f2937; color:#cbd5e1;"></span>
+            <span class="pill" id="problemPoints" style="background:#12212f; color:#38bdf8; border:1px solid #0ea5e9;"></span>
+          </div>
+          <div class="problem-question" id="problemQuestion"></div>
+          <div class="problem-stats" id="problemStats"></div>
+          <div>
+            <input id="answerInput" type="text" placeholder="Type your answer" />
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="submitAnswerBtn">Submit</button>
+            <button class="btn-secondary" id="newProblemBtn">New Problem</button>
+          </div>
+          <div id="answerResult"></div>
+        </div>
+        <button class="btn-primary" id="loadProblemBtn" disabled>Load a Problem</button>
+      </section>
+
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+    <script src="/auth-check.js"></script>
+    <script src="/nav-update.js"></script>
+    <script src="/problems.js"></script>
+  </body>
+</html>

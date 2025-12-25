@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MLSA Cards | Mint & Store</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: "Inter", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at 20% 20%, #0b1220, #0b1323 45%, #08101d 80%);
+        color: #e2e8f0;
+        min-height: 100vh;
+        padding: 24px;
+      }
+      a { color: inherit; text-decoration: none; }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .brand { display: flex; gap: 12px; align-items: center; }
+      .brand-badge {
+        width: 42px; height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #38bdf8, #22d3ee);
+        display: grid; place-items: center;
+        color: #0b1323; font-weight: 800;
+      }
+      nav { display: flex; gap: 12px; align-items: center; }
+      nav a {
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: #111827;
+        color: #cbd5e1;
+        font-weight: 600;
+        border: 1px solid #1f2937;
+        transition: all 0.2s ease;
+      }
+      nav a:hover { background: #1f2937; color: #fff; }
+      nav a.active { background: #22d3ee; color: #0b1323; border-color: #0ea5e9; }
+      .nav-points {
+        margin-left: 12px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: #0f3c2f;
+        color: #34d399;
+        border: 1px solid #14532d;
+        font-weight: 800;
+      }
+      main { max-width: 1100px; margin: 0 auto; display: grid; gap: 16px; }
+      section {
+        background: #0f172a;
+        border: 1px solid #1f2937;
+        border-radius: 14px;
+        padding: 18px 18px 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+      }
+      h2 { font-size: 1.2rem; margin-bottom: 12px; color: #e0f2fe; }
+      button {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+      }
+      .btn-primary { background: linear-gradient(135deg, #22d3ee, #06b6d4); color: #0b1323; }
+      .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(34,211,238,0.35); }
+      .btn-secondary { background: #1f2937; color: #e2e8f0; border: 1px solid #2b3547; }
+      .btn-secondary:hover { background: #273345; }
+      button:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; transform: none; }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-top: 10px;
+      }
+      .status-connected { background: #1e293b; color: #34d399; border: 1px solid #134e4a; }
+      .status-error { background: #2f172a; color: #f87171; border: 1px solid #7f1d1d; }
+      .status-success { background: #12212f; color: #38bdf8; border: 1px solid #0ea5e9; }
+      .connection-grid { display: grid; gap: 8px; margin-top: 10px; }
+      .info-row {
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-between;
+        color: #cbd5e1;
+      }
+      .info-row span:last-child { color: #38bdf8; }
+      .pill { display: inline-block; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; }
+      .pill-green { background: #0f3c2f; color: #34d399; border: 1px solid #0f5132; }
+      .pill-amber { background: #3b2a0f; color: #facc15; border: 1px solid #f59e0b; }
+      .link-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+      .link-chip { background: #111827; border: 1px solid #1f2937; color: #e2e8f0; padding: 8px 12px; border-radius: 999px; font-weight: 700; }
+      .store-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+      .card {
+        background: #0b1220;
+        border: 1px solid #1f2937;
+        border-radius: 14px;
+        padding: 14px;
+        display: grid;
+        gap: 10px;
+      }
+      .card h3 { color: #e2e8f0; font-size: 1.05rem; }
+      .card p { color: #94a3b8; font-size: 0.95rem; }
+      .badge { display: inline-block; padding: 6px 10px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; }
+      .mint-preview {
+        background: #0b1220;
+        border: 1px solid #1f2937;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+      .preview-item { color: #cbd5e1; font-size: 0.95rem; margin-bottom: 6px; }
+      .preview-label { color: #94a3b8; margin-right: 6px; }
+      .form-group { display: grid; gap: 6px; margin-bottom: 12px; }
+      label { color: #cbd5e1; font-weight: 700; }
+      input[type="text"], input[type="url"] {
+        width: 100%;
+        background: #0f172a;
+        border: 1px solid #1f2937;
+        border-radius: 10px;
+        padding: 12px;
+        color: #e2e8f0;
+        font-size: 1rem;
+      }
+      input:focus { outline: 2px solid #22d3ee; }
+      #mintResult {
+        margin-top: 10px;
+        background: #0b1220;
+        border: 1px solid #1f2937;
+        border-radius: 12px;
+        padding: 12px;
+        color: #e2e8f0;
+        font-size: 0.9rem;
+        max-height: 280px;
+        overflow: auto;
+      }
+      .tx-link {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 8px 12px;
+        background: #0f3c2f;
+        color: #34d399;
+        border: 1px solid #14532d;
+        border-radius: 10px;
+        font-weight: 700;
+      }
+      .error-box {
+        background: #2f172a;
+        color: #f87171;
+        border: 1px solid #7f1d1d;
+        padding: 12px;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div class="brand-badge">ML</div>
+        <div>
+          <div style="font-weight:800; color:#e2e8f0;">MLSA Cards</div>
+          <div style="color:#94a3b8; font-size:0.9rem;">Mint NFTs • Buy cards • Earn points</div>
+        </div>
+      </div>
+      <nav>
+        <a href="/index.html" class="active">Mint & Store</a>
+        <a href="/problems.html">Problems</a>
+        <span class="nav-points" id="navPoints">Points: 0</span>
+      </nav>
+    </header>
+
+    <main>
+      <section>
+        <h2>Wallet</h2>
+        <button class="btn-primary" id="connectBtn">Connect Wallet</button>
+        <div class="connection-grid" id="connectionInfo" style="display:none;">
+          <div class="info-row"><span>Wallet</span><span id="wallet">-</span></div>
+          <div class="info-row"><span>Chain ID</span><span id="chainId">-</span></div>
+          <div class="info-row"><span>Network</span><span id="networkName">-</span></div>
+        </div>
+        <div id="status"></div>
+        <button class="btn-secondary" id="signinBtn" disabled>Sign In</button>
+      </section>
+
+      <section>
+        <h2>Points</h2>
+        <div class="link-bar">
+          <a class="link-chip" href="/problems.html">Earn in Problems</a>
+          <span class="pill pill-green">10 points to mint</span>
+        </div>
+      </section>
+
+      <section>
+        <h2>Store • MLSA Cards</h2>
+        <div id="storeGrid" class="store-grid"></div>
+        <div id="storeInfo" style="margin-top:10px; color:#94a3b8; font-size:0.95rem;"></div>
+      </section>
+
+      <section>
+        <h2>Mint NFT</h2>
+        <div class="mint-preview" id="mintPreview" style="display:none;">
+          <div class="preview-item"><span class="preview-label">Name:</span><span id="previewName"></span></div>
+          <div class="preview-item"><span class="preview-label">Description:</span><span id="previewDesc"></span></div>
+          <div class="preview-item"><span class="preview-label">Image:</span><span id="previewImage"></span></div>
+        </div>
+        <div class="form-group">
+          <label for="name">NFT Name *</label>
+          <input id="name" type="text" placeholder="e.g., MLSA Legend" value="MLSA Collectible" />
+        </div>
+        <div class="form-group">
+          <label for="desc">Description *</label>
+          <input id="desc" type="text" placeholder="e.g., A rare collectible from MLSA" value="Unlocked collectible" />
+        </div>
+        <div class="form-group">
+          <label for="image">Image URL (optional)</label>
+          <input id="image" type="url" placeholder="https://example.com/image.jpg" />
+        </div>
+        <button class="btn-primary" id="mintBtn" disabled>Mint NFT</button>
+        <div id="mintResult"></div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+# Node
+node_modules/
+smart-contracts/cache/
+smart-contracts/artifacts/
+
+# Python
+__pycache__/
+.venv/
+*.pyc
+.streamlit/
+
+# Env
+*.env
+.env
+.env.*
+!.env.example
+
+# Database
+*.db
+mlsa_cards.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

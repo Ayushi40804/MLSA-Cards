@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Home | MLSA Cards</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-badge">ML</div>
+        <span class="brand-text">MLSA Cards</span>
+      </div>
+      <div class="nav-right">
+        <a href="/home.html" class="nav-link active">Home</a>
+        <a href="/store.html" class="nav-link">Store</a>
+        <a href="/problems.html" class="nav-link">Problems</a>
+        <a href="/cards.html" class="nav-link">My Cards</a>
+        <span class="nav-points" id="navPoints">Points: 0</span>
+        <div class="user-badge" id="userBadge">
+          <span id="userAddress">0x...</span>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <section class="hero">
+        <h1>Welcome to MLSA Cards</h1>
+        <p>Collect digital cards, solve problems, and mint NFTs</p>
+        <div class="hero-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="pointsDisplay">0</div>
+            <div class="stat-label">Your Points</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">10</div>
+            <div class="stat-label">Cards Available</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">5</div>
+            <div class="stat-label">Problems to Solve</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Quick Actions</h2>
+        <div class="action-grid">
+          <a href="/store.html" class="action-card">
+            <div class="action-icon">🛒</div>
+            <h3>Visit Store</h3>
+            <p>Browse and purchase MLSA cards with your points</p>
+          </a>
+          <a href="/problems.html" class="action-card">
+            <div class="action-icon">🧩</div>
+            <h3>Solve Problems</h3>
+            <p>Earn points by solving challenges</p>
+          </a>
+          <a href="/mint.html" class="action-card">
+            <div class="action-icon">🎨</div>
+            <h3>Mint NFT</h3>
+            <p>Create your unique NFT collectible</p>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Your Wallet</h2>
+        <div class="wallet-info">
+          <div class="info-row">
+            <span>Address:</span>
+            <span id="fullAddress">-</span>
+          </div>
+          <div class="info-row">
+            <span>Network:</span>
+            <span id="networkName">-</span>
+          </div>
+          <div class="info-row">
+            <span>Chain ID:</span>
+            <span id="chainId">-</span>
+          </div>
+        </div>
+        <button class="btn-secondary" id="logoutBtn">Disconnect</button>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+    <script>
+      // Check for OAuth token in URL (MUST run before auth-check.js)
+      const urlParams = new URLSearchParams(window.location.search);
+      const oauthToken = urlParams.get('token');
+      if (oauthToken) {
+        localStorage.setItem('mlsa_token', oauthToken);
+        // Clean URL
+        window.history.replaceState({}, document.title, '/home.html');
+      }
+    </script>
+    <script src="/auth-check.js"></script>
+    <script src="/nav-update.js"></script>
+    <script>
+      const pointsDisplay = document.getElementById("pointsDisplay");
+      const fullAddress = document.getElementById("fullAddress");
+      const networkName = document.getElementById("networkName");
+      const chainId = document.getElementById("chainId");
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      const networkNames = {
+        "31337": "Hardhat (Localhost)",
+        "11155111": "Sepolia Testnet",
+        "80002": "Polygon Amoy",
+        "137": "Polygon Mainnet",
+        "1": "Ethereum Mainnet",
+      };
+
+      async function loadData() {
+        const wallet = localStorage.getItem("mlsa_wallet");
+        const savedChainId = localStorage.getItem("mlsa_chainId");
+        const token = localStorage.getItem("mlsa_token");
+
+        if (wallet) {
+          fullAddress.textContent = wallet;
+        }
+        if (savedChainId) {
+          chainId.textContent = savedChainId;
+          networkName.textContent = networkNames[savedChainId] || "Unknown";
+        }
+
+        // Fetch points
+        if (token) {
+          try {
+            const resp = await fetch("/game/points", {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            const json = await resp.json();
+            pointsDisplay.textContent = json.points || 0;
+          } catch (err) {
+            console.error("Error loading points:", err);
+          }
+        }
+      }
+
+      logoutBtn.onclick = () => {
+        localStorage.clear();
+        window.location.href = "/login.html";
+      };
+
+      loadData();
+    </script>
+  </body>
+</html>

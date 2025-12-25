@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Cards | MLSA Cards</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .card-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .card-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      }
+
+      .card-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      .card-body {
+        padding: 1.25rem;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 0.75rem;
+      }
+
+      .card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin: 0;
+      }
+
+      .card-rarity {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .rarity-common {
+        background: rgba(148, 163, 184, 0.2);
+        color: #94a3b8;
+      }
+
+      .rarity-uncommon {
+        background: rgba(34, 211, 238, 0.2);
+        color: #22d3ee;
+      }
+
+      .rarity-rare {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+
+      .rarity-epic {
+        background: rgba(168, 85, 247, 0.2);
+        color: #a855f7;
+      }
+
+      .rarity-legendary {
+        background: rgba(251, 113, 133, 0.2);
+        color: #fb7185;
+      }
+
+      .card-description {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+      }
+
+      .card-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .card-date {
+        font-size: 0.8rem;
+        color: #64748b;
+      }
+
+      .mint-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .status-unminted {
+        background: rgba(251, 191, 36, 0.1);
+        color: #fbbf24;
+      }
+
+      .status-minted {
+        background: rgba(34, 211, 238, 0.1);
+        color: #22d3ee;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #64748b;
+      }
+
+      .empty-state h2 {
+        color: #94a3b8;
+        margin-bottom: 1rem;
+      }
+
+      .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-badge">ML</div>
+        <span class="brand-text">MLSA Cards</span>
+      </div>
+      <div class="nav-right">
+        <a href="/home.html" class="nav-link">Home</a>
+        <a href="/store.html" class="nav-link">Store</a>
+        <a href="/problems.html" class="nav-link">Problems</a>
+        <a href="/cards.html" class="nav-link active">My Cards</a>
+        <span class="nav-points" id="navPoints">Points: 0</span>
+        <div class="user-badge" id="userBadge">
+          <span id="userAddress">0x...</span>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <section class="section">
+        <h1>My Card Collection</h1>
+        <p style="color: #94a3b8; font-size: 1.1rem;">
+          Cards you've purchased with points. Connect wallet to mint as NFTs!
+        </p>
+
+        <div id="cardsContainer"></div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+    <script src="/auth-check.js"></script>
+    <script src="/nav-update.js"></script>
+    <script>
+      const token = localStorage.getItem('mlsa_token');
+      const wallet = localStorage.getItem('mlsa_wallet');
+
+      async function loadCards() {
+        try {
+          const res = await fetch('/game/cards', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+
+          const container = document.getElementById('cardsContainer');
+
+          if (!data.cards || data.cards.length === 0) {
+            container.innerHTML = `
+              <div class="empty-state">
+                <div class="empty-state-icon">🎴</div>
+                <h2>No Cards Yet</h2>
+                <p>Visit the <a href="/store.html" style="color: #22d3ee;">Store</a> to purchase your first card!</p>
+              </div>
+            `;
+            return;
+          }
+
+          const cardsHTML = data.cards.map(card => {
+            const rarityClass = `rarity-${card.rarity.toLowerCase()}`;
+            const mintStatus = card.is_minted 
+              ? `<span class="status-badge status-minted">✓ Minted #${card.token_id}</span>`
+              : `<button class="btn btn-primary" onclick="mintCard(${card.id})">🎨 Mint as NFT</button>`;
+            
+            const purchaseDate = new Date(card.purchased_at).toLocaleDateString();
+            const txLink = card.is_minted 
+              ? `<a href="https://etherscan.io/tx/${card.tx_hash}" target="_blank" style="color: #22d3ee; font-size: 0.8rem; margin-top: 0.5rem; display: inline-block;">View Transaction ↗</a>`
+              : '';
+
+            return `
+              <div class="card-item">
+                <img src="${card.image}" alt="${card.name}" class="card-image" />
+                <div class="card-body">
+                  <div class="card-header">
+                    <h3 class="card-title">${card.name}</h3>
+                    <span class="card-rarity ${rarityClass}">${card.rarity}</span>
+                  </div>
+                  <p class="card-description">${card.description}</p>
+                  <div class="card-meta">
+                    <span class="card-date">Purchased ${purchaseDate}</span>
+                  </div>
+                  <div class="mint-status" style="margin-top: 1rem;">
+                    ${mintStatus}
+                  </div>
+                  ${txLink}
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          container.innerHTML = `<div class="cards-grid">${cardsHTML}</div>`;
+        } catch (err) {
+          console.error('Failed to load cards:', err);
+          document.getElementById('cardsContainer').innerHTML = `
+            <div class="status-message status-error">Failed to load cards: ${err.message}</div>
+          `;
+        }
+      }
+
+      async function mintCard(cardId) {
+        // Check if wallet is connected
+        if (!wallet) {
+          alert('Please link your wallet first!\n\nYou can connect your wallet in the profile/settings.');
+          return;
+        }
+
+        const confirmed = confirm('Mint this card as an NFT on the blockchain?\n\nThis will create a permanent on-chain record.');
+        if (!confirmed) return;
+
+        try {
+          // Get provider and signer
+          if (!window.ethereum) {
+            throw new Error('MetaMask not found');
+          }
+
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+
+          // Call mint endpoint
+          const res = await fetch(`/game/mint/${cardId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.detail || 'Mint failed');
+          }
+
+          const mintData = await res.json();
+          alert(`✅ NFT Minted Successfully!\n\nToken ID: ${mintData.tokenId}\nTransaction: ${mintData.transactionHash}`);
+
+          // Reload cards
+          await loadCards();
+        } catch (err) {
+          console.error('Mint error:', err);
+          alert(`❌ Mint Failed: ${err.message}`);
+        }
+      }
+
+      // Load cards on page load
+      loadCards();
+    </script>
+  </body>
+</html>

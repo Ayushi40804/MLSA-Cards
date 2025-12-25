@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Store | MLSA Cards</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        background: #0f172a;
+        color: #e2e8f0;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid #22d3ee;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        z-index: 999;
+        pointer-events: none;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .toast-success { border-color: #22c55e; color: #bbf7d0; }
+      .toast-error { border-color: #ef4444; color: #fecdd3; }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-badge">ML</div>
+        <span class="brand-text">MLSA Cards</span>
+      </div>
+      <div class="nav-right">
+        <a href="/home.html" class="nav-link">Home</a>
+        <a href="/store.html" class="nav-link active">Store</a>
+        <a href="/problems.html" class="nav-link">Problems</a>
+        <a href="/cards.html" class="nav-link">My Cards</a>
+        <span class="nav-points" id="navPoints">Points: 0</span>
+        <div class="user-badge" id="userBadge">
+          <span id="userAddress">0x...</span>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <section class="section">
+        <h1>MLSA Cards Store</h1>
+        <p class="subtitle">Purchase exclusive cards with your earned points</p>
+        
+        <div id="storeGrid" class="store-grid"></div>
+        <div id="storeStatus" class="status-message"></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+    <script src="/auth-check.js"></script>
+    <script src="/nav-update.js"></script>
+    <script>
+      const storeGrid = document.getElementById("storeGrid");
+      const storeStatus = document.getElementById("storeStatus");
+      const toastEl = document.getElementById("toast");
+      const token = localStorage.getItem("mlsa_token");
+
+      function showToast(message, type = "success") {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.className = `toast show toast-${type}`;
+        setTimeout(() => {
+          toastEl.className = "toast";
+        }, 2500);
+      }
+
+      function renderStore(items = []) {
+        storeGrid.innerHTML = "";
+        if (!items.length) {
+          storeGrid.innerHTML = "<div class='empty-state'>No items available</div>";
+          return;
+        }
+        
+        items.forEach((item) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px 8px 0 0;" />
+            <div class="card-header" style="border-bottom: 3px solid ${item.color}">
+              <h3>${item.name}</h3>
+              <span class="badge" style="background: ${item.color}; color: #0b1323;">${item.rarity}</span>
+            </div>
+            <p class="card-desc">${item.description}</p>
+            <div class="card-footer">
+              <span class="price-tag">${item.price} pts</span>
+              <button class="btn-primary btn-sm" data-item="${item.id}" ${item.owned ? 'disabled' : ''}>${item.owned ? 'Owned' : 'Buy Now'}</button>
+            </div>
+          `;
+          const btn = card.querySelector("button");
+          if (!item.owned) {
+            btn.onclick = () => purchaseItem(item.id, item.name, item.price);
+          }
+          storeGrid.appendChild(card);
+        });
+      }
+
+      async function loadStore() {
+        try {
+          const resp = await fetch("/game/store/items", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const json = await resp.json();
+          renderStore(json.items || []);
+        } catch (err) {
+          storeStatus.innerHTML = `<div class="status-error">Error loading store: ${err.message}</div>`;
+        }
+      }
+
+      async function purchaseItem(itemId, itemName, price) {
+        try {
+          storeStatus.innerHTML = `<div class="status-info">🔄 Purchasing ${itemName}...</div>`;
+          const resp = await fetch("/game/store/purchase", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ item_id: itemId }),
+          });
+          const json = await resp.json();
+          
+          if (!resp.ok) {
+            storeStatus.innerHTML = `<div class="status-error">❌ ${json.detail || "Purchase failed"}</div>`;
+            showToast(json.detail || "Purchase failed", "error");
+            return;
+          }
+          
+          storeStatus.innerHTML = `<div class="status-success">✅ Purchased ${itemName} for ${price} points!</div>`;
+          showToast(`Purchased ${itemName} for ${price} pts`, "success");
+          
+          // Refresh points in nav
+          if (window.updateNavPoints) {
+            window.updateNavPoints();
+          }
+
+          // Reload store to reflect ownership state
+          loadStore();
+          
+          setTimeout(() => {
+            storeStatus.innerHTML = "";
+          }, 3000);
+        } catch (err) {
+          storeStatus.innerHTML = `<div class="status-error">❌ Error: ${err.message}</div>`;
+          showToast(err.message, "error");
+        }
+      }
+
+      loadStore();
+    </script>
+  </body>
+</html>
