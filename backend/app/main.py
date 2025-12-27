@@ -26,7 +26,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(game.router)
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/health")
