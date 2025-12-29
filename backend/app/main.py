@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi.responses import RedirectResponse
+
 
 from .config import get_settings
 from .routers import auth, game
@@ -32,3 +34,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/docs")
