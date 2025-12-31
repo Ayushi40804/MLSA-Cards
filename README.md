@@ -65,7 +65,7 @@ MLSA Cards is a gamified learning platform that combines education with blockcha
 ## 📋 Prerequisites
 
 - **Node.js** 18+ and npm
-- **Python** 3.10+
+- **Python** Python 3.10–3.11 required. Python 3.13 not supported.
 - **MetaMask** browser extension
 - **Google OAuth Credentials** (for OAuth login)
 - **Pinata Account** (for IPFS storage)
